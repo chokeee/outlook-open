@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Open in Outlook</title>
+<style>
+  :root { color-scheme: light dark; --ink: #1b1b1f; --soft: #5c5f66; --paper: #ffffff; --accent: #0f6cbd; --on-accent: #ffffff; }
+  @media (prefers-color-scheme: dark) { :root { --ink: #ececf1; --soft: #a2a5ad; --paper: #17181c; --accent: #479ef5; --on-accent: #0b0c0e; } }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: var(--paper); color: var(--ink); font: 17px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  main { width: min(26rem, 100% - 2rem); text-align: center; }
+  h1 { font-size: 1.25rem; font-weight: 600; margin: 0 0 0.5rem; }
+  p { margin: 0 0 1.25rem; color: var(--soft); }
+  a.go { display: block; padding: 0.85rem 1rem; border-radius: 0.6rem; background: var(--accent); color: var(--on-accent); font-weight: 600; text-decoration: none; }
+  a.web { display: inline-block; margin-top: 1rem; color: var(--accent); }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <h1 id="title">Opening the mail in Outlook</h1>
+  <p id="say">If nothing happens, use the button.</p>
+  <a id="go" class="go" hidden>Open in Outlook</a>
+  <a id="web" class="web" hidden>Open in the browser instead</a>
+</main>
+<script>
+(function () {
+  "use strict";
+  // The mail's id and the account sit after the #, which a browser never sends to a server.
+  var params = new URLSearchParams(location.hash.slice(1));
+  var id = params.get("m") || "", account = params.get("a") || "";
+  var ok = /^[A-Za-z0-9_=-]{16,600}$/.test(id) && /^[A-Za-z0-9._+-]{1,64}@[A-Za-z0-9.-]{1,255}$/.test(account);
+  if (!ok) {
+    document.getElementById("title").textContent = "This link is not complete";
+    document.getElementById("say").textContent = "Open the mail from Outlook itself.";
+    return;
+  }
+  // Only ever a mail in Outlook: this page cannot be used to open anything else.
+  var app = "ms-outlook://emails/message/" + id + "?account=" + encodeURI(account);
+  var web = "https://outlook.office365.com/owa/?ItemID=" + encodeURIComponent(id.replace(/-/g, "/").replace(/_/g, "+")) + "&exvsurl=1&viewmodel=ReadMessageItem";
+  var go = document.getElementById("go"), other = document.getElementById("web");
+  go.href = app; go.hidden = false;
+  other.href = web; other.hidden = false;
+  location.href = app;
+})();
+</script>
+</body>
+</html>
