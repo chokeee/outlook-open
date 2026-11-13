@@ -41,6 +41,15 @@
   var app = "ms-outlook://emails/message/" + id + "?account=" + encodeURI(account);
   var web = "https://outlook.office365.com/owa/?ItemID=" + encodeURIComponent(id.replace(/-/g, "/").replace(/_/g, "+")) + "&exvsurl=1&viewmodel=ReadMessageItem";
   var go = document.getElementById("go"), other = document.getElementById("web");
+  // Outlook for Mac reads another link grammar and cannot find the mail from this one; an iPad calls itself a Mac but has touch.
+  var mac = /Macintosh/.test(navigator.userAgent) && !(navigator.maxTouchPoints > 1);
+  if (mac) {
+    document.getElementById("title").textContent = "Opening the mail in Outlook on the web";
+    go.textContent = "Open in Outlook on the web";
+    go.href = web; go.hidden = false;
+    location.replace(web);
+    return;
+  }
   go.href = app; go.hidden = false;
   other.href = web; other.hidden = false;
   location.href = app;
